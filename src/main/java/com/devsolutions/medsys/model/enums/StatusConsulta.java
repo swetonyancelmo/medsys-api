@@ -1,4 +1,4 @@
-package com.devsolutions.medsys.model;
+package com.devsolutions.medsys.model.enums;
 
 public enum StatusConsulta {
     AGENDADA,
