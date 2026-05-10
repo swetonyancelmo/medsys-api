@@ -1,6 +1,6 @@
 package com.devsolutions.medsys.model;
 
-import com.devsolutions.medsys.model.enums.StatusConsulta;
+import com.devsolutions.medsys.enums.StatusConsulta;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
