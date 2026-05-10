@@ -15,15 +15,18 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Receita {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "consulta_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "consulta_id", nullable = false, unique = true,
+            foreignKey = @ForeignKey(name = "fk_receita_consulta"))
     private Consulta consulta;
 
     @Column(columnDefinition = "TEXT", nullable = false)
@@ -32,7 +35,6 @@ public class Receita {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String medicamentos;
 
-    @Column(nullable = false)
     private LocalDate validade;
 
     @CreationTimestamp

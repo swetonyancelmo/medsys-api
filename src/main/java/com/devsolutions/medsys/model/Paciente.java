@@ -17,31 +17,44 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Paciente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
     private UUID id;
 
-    @Column(nullable = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false, unique = true,
+            foreignKey = @ForeignKey(name = "fk_paciente_usuario"))
+    private User usuario;
+
+    @Column(nullable = false, length = 255)
     private String nome;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 14)
     private String cpf;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Telefone> telefones = new ArrayList<>();
+    @Column(length = 20)
+    private String telefone;
 
-    @Column(nullable = false)
+    @Column(name = "data_nascimento")
     private LocalDate dataNascimento;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "endereco_id", nullable = false, unique = true)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "endereco_id", unique = true,
+            foreignKey = @ForeignKey(name = "fk_paciente_endereco"))
     private Endereco endereco;
 
+    @Builder.Default
     @Column(nullable = false)
-    private Boolean ativo;
+    private Boolean ativo = true;
+
+    @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Consulta> consultas = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
