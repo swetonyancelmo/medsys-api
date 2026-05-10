@@ -5,6 +5,8 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -13,11 +15,13 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     @Column(unique = true, nullable = false)
@@ -26,8 +30,23 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Builder.Default
     @Column(nullable = false)
-    private boolean ativo;
+    private boolean ativo = true;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<UserRole> roles = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Telefone> telefones = new ArrayList<>();
+
+    @OneToOne(mappedBy = "usuario", fetch = FetchType.LAZY)
+    private Medico medico;
+
+    @OneToOne(mappedBy = "usuario", fetch = FetchType.LAZY)
+    private Paciente paciente;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp

@@ -17,14 +17,16 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class DisponibilidadeMedico {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "medico_id", nullable = false)
+    @JoinColumn(name = "medico_id", nullable = false, foreignKey = @ForeignKey(name = "fk_disponibilidade_medico"))
     private Medico medico;
 
     @Column(name = "dia_semana", nullable = false)

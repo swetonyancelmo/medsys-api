@@ -11,20 +11,21 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class UserRole {
 
     @EmbeddedId
+    @EqualsAndHashCode.Include
     private UserRoleId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId("usuarioId")
-    @JoinColumn(name = "usuario_id", nullable = false)
+    @JoinColumn(name = "usuario_id", nullable = false, foreignKey = @ForeignKey(name = "fk_usuario_role_usuario"))
     private User usuario;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId("roleId")
-    @JoinColumn(name = "role_id", nullable = false)
+    @JoinColumn(name = "role_id", nullable = false, foreignKey = @ForeignKey(name = "fk_usuario_role_role"))
     private Role role;
 
 }

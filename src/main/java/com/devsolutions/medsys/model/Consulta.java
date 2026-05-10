@@ -18,11 +18,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Consulta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
+    @EqualsAndHashCode.Include
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,6 +48,9 @@ public class Consulta {
 
     @Column(columnDefinition = "TEXT")
     private String observacoes;
+
+    @OneToOne(mappedBy = "consulta", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Receita receita;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
