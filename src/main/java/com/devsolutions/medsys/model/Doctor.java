@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "medico")
+@Table(name = "doctor")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Medico {
+public class Doctor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -26,39 +26,39 @@ public class Medico {
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "usuario_id", nullable = false, unique = true,
-            foreignKey = @ForeignKey(name = "fk_medico_usuario"))
-    private User usuario;
+    @JoinColumn(name = "user_id", nullable = false, unique = true,
+            foreignKey = @ForeignKey(name = "fk_doctor_user"))
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "especialidade_id", nullable = false,
-            foreignKey = @ForeignKey(name = "fk_medico_especialidade"))
-    private Especialidade especialidade;
+    @JoinColumn(name = "specialty_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_doctor_specialty"))
+    private Specialty specialty;
 
     @Column(nullable = false, length = 255)
-    private String nome;
+    private String name;
 
     @Column(nullable = false, unique = true, length = 20)
     private String crm;
 
     @Column(length = 20)
-    private String telefone;
+    private String phone;
 
     @Builder.Default
-    @Column(name = "duracao_consulta_min", nullable = false)
-    private Integer duracaoConsultaMin = 30;
+    @Column(name = "appointment_duration_min", nullable = false)
+    private Integer appointmentDurationMin = 30;
 
     @Builder.Default
     @Column(nullable = false)
-    private Boolean ativo = true;
+    private Boolean active = true;
 
-    @OneToMany(mappedBy = "medico", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "doctor", fetch = FetchType.LAZY)
     @Builder.Default
-    private List<Consulta> consultas = new ArrayList<>();
+    private List<Appointment> appointments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<DisponibilidadeMedico> disponibilidades = new ArrayList<>();
+    private List<DoctorAvailability> availabilities = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp

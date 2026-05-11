@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "role")
+@Table(name = "roles")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,9 +23,9 @@ public class Role {
     private UUID id;
 
     @Column(nullable = false, unique = true, length = 50)
-    private String nome;
+    private String name;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<UserRole> usuarios = new ArrayList<>();
+    private List<UserRole> users = new ArrayList<>();
 }

@@ -3,10 +3,8 @@ package com.devsolutions.medsys.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.UUID;
-
 @Entity
-@Table(name = "usuario_role")
+@Table(name = "user_roles")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,13 +17,13 @@ public class UserRole {
     private UserRoleId id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @MapsId("usuarioId")
-    @JoinColumn(name = "usuario_id", nullable = false, foreignKey = @ForeignKey(name = "fk_usuario_role_usuario"))
-    private User usuario;
+    @MapsId("userId")
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_user_roles_user"))
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId("roleId")
-    @JoinColumn(name = "role_id", nullable = false, foreignKey = @ForeignKey(name = "fk_usuario_role_role"))
+    @JoinColumn(name = "role_id", nullable = false, foreignKey = @ForeignKey(name = "fk_user_roles_role"))
     private Role role;
 
 }

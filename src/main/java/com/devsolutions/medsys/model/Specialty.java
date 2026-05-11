@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "especialidade")
+@Table(name = "specialty")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Especialidade {
+public class Specialty {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -23,12 +23,12 @@ public class Especialidade {
     private UUID id;
 
     @Column(nullable = false, length = 100)
-    private String nome;
+    private String name;
 
     @Column(length = 255)
-    private String descricao;
+    private String description;
 
-    @OneToMany(mappedBy = "especialidade", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "specialty", fetch = FetchType.LAZY)
     @Builder.Default
-    private List<Medico> medicos = new ArrayList<>();
+    private List<Doctor> doctors = new ArrayList<>();
 }

@@ -9,14 +9,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "receita")
+@Table(name = "prescription")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Receita {
+public class Prescription {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -25,19 +25,20 @@ public class Receita {
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "consulta_id", nullable = false, unique = true,
-            foreignKey = @ForeignKey(name = "fk_receita_consulta"))
-    private Consulta consulta;
+    @JoinColumn(name = "appointment_id", nullable = false, unique = true,
+            foreignKey = @ForeignKey(name = "fk_prescription_appointment"))
+    private Appointment appointment;
 
     @Column(columnDefinition = "TEXT", nullable = false)
-    private String descricao;
+    private String description;
 
     @Column(columnDefinition = "TEXT", nullable = false)
-    private String medicamentos;
+    private String medications;
 
-    private LocalDate validade;
+    @Column(name = "expires_at")
+    private LocalDate expiresAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime dataCriado;
+    private LocalDateTime createdAt;
 }

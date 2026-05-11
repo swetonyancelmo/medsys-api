@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "paciente")
+@Table(name = "patient")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Paciente {
+public class Patient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,32 +27,32 @@ public class Paciente {
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "usuario_id", nullable = false, unique = true,
-            foreignKey = @ForeignKey(name = "fk_paciente_usuario"))
-    private User usuario;
+    @JoinColumn(name = "user_id", nullable = false, unique = true,
+            foreignKey = @ForeignKey(name = "fk_patient_user"))
+    private User user;
 
     @Column(nullable = false, length = 255)
-    private String nome;
+    private String name;
 
     @Column(nullable = false, unique = true, length = 14)
     private String cpf;
 
     @Column(length = 20)
-    private String telefone;
+    private String phone;
 
-    @Column(name = "data_nascimento")
-    private LocalDate dataNascimento;
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
 
     @Column(length = 255)
-    private String endereco;
+    private String address;
 
     @Builder.Default
     @Column(nullable = false)
-    private Boolean ativo = true;
+    private Boolean active = true;
 
-    @OneToMany(mappedBy = "paciente", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
     @Builder.Default
-    private List<Consulta> consultas = new ArrayList<>();
+    private List<Appointment> appointments = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp

@@ -1,7 +1,0 @@
-CREATE TABLE role (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    nome VARCHAR(50) NOT NULL UNIQUE
-);
-
-INSERT INTO role (nome) VALUES ('ROLE_PACIENTE');
-INSERT INTO role (nome) VALUES ('ROLE_MEDICO');
