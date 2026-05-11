@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "usuario")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,9 +32,9 @@ public class User {
 
     @Builder.Default
     @Column(nullable = false)
-    private boolean ativo = true;
+    private boolean active = true;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<UserRole> roles = new ArrayList<>();
 
