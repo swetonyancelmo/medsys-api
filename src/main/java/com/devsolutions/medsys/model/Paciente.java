@@ -43,10 +43,8 @@ public class Paciente {
     @Column(name = "data_nascimento")
     private LocalDate dataNascimento;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "endereco_id", unique = true,
-            foreignKey = @ForeignKey(name = "fk_paciente_endereco"))
-    private Endereco endereco;
+    @Column(length = 255)
+    private String endereco;
 
     @Builder.Default
     @Column(nullable = false)

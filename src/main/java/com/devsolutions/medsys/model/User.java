@@ -38,16 +38,6 @@ public class User {
     @Builder.Default
     private List<UserRole> roles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Telefone> telefones = new ArrayList<>();
-
-    @OneToOne(mappedBy = "usuario", fetch = FetchType.LAZY)
-    private Medico medico;
-
-    @OneToOne(mappedBy = "usuario", fetch = FetchType.LAZY)
-    private Paciente paciente;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;

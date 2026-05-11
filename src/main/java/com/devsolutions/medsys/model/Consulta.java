@@ -39,7 +39,7 @@ public class Consulta {
     private LocalDateTime dataHora;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "status_consulta")
     @Builder.Default
     private StatusConsulta status = StatusConsulta.AGENDADA;
 
