@@ -16,3 +16,8 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+
+## Jwt Secret que será utilizada em ambiente de DEV, em produção deve ser injetada via variável de ambiente ou serviço de gerenciamento de segredos
+jwt:
+  secret: "dGhpcy1pcy1hLXZlcnktc2VjcmV0LWtleS1mb3ItbWVkc3lzLWp3dC0yNTZiaXRz"
+  expiration-ms: 86400000
