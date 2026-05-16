@@ -8,8 +8,10 @@ import com.devsolutions.medsys.exception.ResourceNotFoundException;
 import com.devsolutions.medsys.mapper.AppointmentMapper;
 import com.devsolutions.medsys.model.Appointment;
 import com.devsolutions.medsys.model.Doctor;
+import com.devsolutions.medsys.model.DoctorAvailability;
 import com.devsolutions.medsys.model.Patient;
 import com.devsolutions.medsys.repository.AppointmentRepository;
+import com.devsolutions.medsys.repository.DoctorAvailabilityRepository;
 import com.devsolutions.medsys.repository.DoctorRepository;
 import com.devsolutions.medsys.repository.PatientRepository;
 import jakarta.transaction.Transactional;
@@ -17,9 +19,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ public class AppointmentService {
     private final AppointmentMapper mapper;
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
+    private final DoctorAvailabilityRepository doctorAvailabilityRepository;
 
 
     @Transactional
@@ -40,11 +44,8 @@ public class AppointmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Paciente não encontrado com o ID fornecido."));
 
 
-        boolean hasConclict = repository.findByDoctorIdAndScheduledAt(dto.doctorId(), dto.scheduledAt()).isPresent();
-
-        if(hasConclict){
-            throw new BusinessException("O médico já possui um agendamento para esse horário.");
-        }
+        validateDoctorAvailability(dto);
+        validateScheduleConflicts(dto);
 
         Appointment appointment = Appointment.builder()
                 .doctor(doctor)
@@ -68,10 +69,11 @@ public class AppointmentService {
 
     @Transactional
     public List<AppointmentResponseDTO> findByDoctorAndDateRange(UUID id, LocalDateTime start, LocalDateTime end){
+        validateDateRange(start, end);
         return repository.findByDoctorIdAndScheduledAtBetween(id,start,end)
                 .stream()
                 .map(mapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
@@ -79,15 +81,16 @@ public class AppointmentService {
         return repository.findByPatientIdOrderByScheduledAtDesc(id)
                 .stream()
                 .map(mapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
     public List<AppointmentResponseDTO> findByDateRange(LocalDateTime start, LocalDateTime end){
+        validateDateRange(start, end);
         return repository.findByScheduledAtBetweenOrderByScheduledAtAsc(start,end)
                 .stream()
                 .map(mapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public AppointmentResponseDTO cancel(UUID id){
@@ -95,7 +98,7 @@ public class AppointmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado."));
 
         if(appointment.getStatus() != AppointmentStatus.SCHEDULED){
-            throw new BusinessException("Apenas Agendamento com status de AGENDADO pode ser cancelado.");
+            throw new BusinessException("Apenas agendamentos com status AGENDADO podem ser cancelados.");
         }
 
         if(appointment.getScheduledAt().isBefore(LocalDateTime.now())){
@@ -106,5 +109,37 @@ public class AppointmentService {
         Appointment saved = repository.save(appointment);
 
         return mapper.toDTO(saved);
+    }
+
+    private void validateScheduleConflicts(AppointmentRequestDTO dto) {
+        repository.findByDoctorIdAndScheduledAtAndStatusNot(
+                dto.doctorId(), dto.scheduledAt(), AppointmentStatus.CANCELLED
+        ).ifPresent(appointment -> {
+            throw new BusinessException("O médico já possui um agendamento ativo para esse horário.");
+        });
+
+        repository.findByPatientIdAndScheduledAtAndStatusNot(
+                dto.patientId(), dto.scheduledAt(), AppointmentStatus.CANCELLED
+        ).ifPresent(appointment -> {
+            throw new BusinessException("O paciente já possui um agendamento ativo para esse horário.");
+        });
+    }
+
+    private void validateDoctorAvailability(AppointmentRequestDTO dto) {
+        int dayOfWeek = dto.scheduledAt().getDayOfWeek().getValue();
+        DoctorAvailability availability = doctorAvailabilityRepository
+                .findByDoctorIdAndDayOfWeekAndActiveTrue(dto.doctorId(), dayOfWeek)
+                .orElseThrow(() -> new BusinessException("O médico não possui disponibilidade ativa para esse dia da semana."));
+
+        LocalTime appointmentTime = dto.scheduledAt().toLocalTime();
+        if (appointmentTime.isBefore(availability.getStartTime()) || !appointmentTime.isBefore(availability.getEndTime())) {
+            throw new BusinessException("O horário solicitado está fora da disponibilidade ativa do médico.");
+        }
+    }
+
+    private void validateDateRange(LocalDateTime start, LocalDateTime end) {
+        if (start.isAfter(end)) {
+            throw new BusinessException("A data inicial deve ser anterior ou igual à data final.");
+        }
     }
 }

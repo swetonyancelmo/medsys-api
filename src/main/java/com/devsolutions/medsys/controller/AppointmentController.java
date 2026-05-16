@@ -2,8 +2,8 @@ package com.devsolutions.medsys.controller;
 
 import com.devsolutions.medsys.dto.appointment.AppointmentRequestDTO;
 import com.devsolutions.medsys.dto.appointment.AppointmentResponseDTO;
-import com.devsolutions.medsys.model.Appointment;
 import com.devsolutions.medsys.service.AppointmentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class AppointmentController {
     private final AppointmentService service;
 
     @PostMapping()
-    public ResponseEntity<AppointmentResponseDTO> schedule(@RequestBody AppointmentRequestDTO dto){
+    public ResponseEntity<AppointmentResponseDTO> schedule(@RequestBody @Valid AppointmentRequestDTO dto){
         AppointmentResponseDTO response = service.schedule(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
