@@ -9,9 +9,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "appointment", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_doctor_scheduled_at", columnNames = {"doctor_id", "scheduled_at"})
-})
+@Table(name = "appointment")
 @Getter
 @Setter
 @AllArgsConstructor
