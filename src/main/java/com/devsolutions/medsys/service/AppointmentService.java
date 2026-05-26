@@ -93,6 +93,7 @@ public class AppointmentService {
                 .toList();
     }
 
+    @Transactional
     public AppointmentResponseDTO cancel(UUID id){
         Appointment appointment = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado."));

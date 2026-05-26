@@ -1,35 +1,63 @@
 package com.devsolutions.medsys.service;
+
+import com.devsolutions.medsys.dto.patient.PatientRequestDTO;
+import com.devsolutions.medsys.dto.patient.PatientResponseDTO;
+import com.devsolutions.medsys.exception.ResourceNotFoundException;
+import com.devsolutions.medsys.mapper.PatientMapper;
+import com.devsolutions.medsys.model.Patient;
+import com.devsolutions.medsys.model.User;
+import com.devsolutions.medsys.repository.PatientRepository;
+import com.devsolutions.medsys.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.UUID;
-import com.devsolutions.medsys.model.Patient;
-import com.devsolutions.medsys.repository.PatientRepository;
-import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class PatientService {
 
     private final PatientRepository patientRepository;
+    private final UserRepository userRepository;
+    private final PatientMapper patientMapper;
 
-    public PatientService(PatientRepository patientRepository) {
-        this.patientRepository = patientRepository;
+    @Transactional
+    public PatientResponseDTO create(PatientRequestDTO dto) {
+        User user = userRepository.findById(dto.userId())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        Patient patient = Patient.builder()
+                .user(user)
+                .name(dto.name())
+                .cpf(dto.cpf())
+                .phone(dto.phone())
+                .birthDate(dto.birthDate())
+                .address(dto.address())
+                .build();
+
+        return patientMapper.toDTO(patientRepository.save(patient));
     }
 
-    public Patient create(Patient patient) {
-        return patientRepository.save(patient);
+    @Transactional(readOnly = true)
+    public List<PatientResponseDTO> findAll() {
+        return patientRepository.findAll().stream()
+                .map(patientMapper::toDTO)
+                .toList();
     }
-    public List<Patient> findAll() {
 
-        return patientRepository.findAll();
+    @Transactional(readOnly = true)
+    public PatientResponseDTO findById(UUID id) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente não encontrado"));
+        return patientMapper.toDTO(patient);
     }
-    public Patient findById(UUID id) {
 
-        return patientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Patient not found"));
-    }
+    @Transactional
     public void delete(UUID id) {
-
-        Patient patient = findById(id);
-
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente não encontrado"));
         patientRepository.delete(patient);
     }
 }
