@@ -5,6 +5,7 @@ import com.devsolutions.medsys.dto.appointment.AppointmentResponseDTO;
 import com.devsolutions.medsys.service.AppointmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,10 +33,11 @@ public class AppointmentController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}/{start}/{end}")
-    public ResponseEntity<List<AppointmentResponseDTO>> findByDoctorAndDateRange(@PathVariable UUID id,
-                                                                @PathVariable LocalDateTime start,
-                                                                @PathVariable LocalDateTime end) {
+    @GetMapping("/doctor/{id}")
+    public ResponseEntity<List<AppointmentResponseDTO>> findByDoctorAndDateRange(
+            @PathVariable UUID id,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
         List<AppointmentResponseDTO> response = service.findByDoctorAndDateRange(id, start, end);
         return ResponseEntity.ok(response);
     }
@@ -46,9 +48,10 @@ public class AppointmentController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{start}/{end}")
-    public ResponseEntity<List<AppointmentResponseDTO>> findByDateRange(@PathVariable LocalDateTime start,
-                                                                        @PathVariable LocalDateTime end) {
+    @GetMapping("/range")
+    public ResponseEntity<List<AppointmentResponseDTO>> findByDateRange(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
         List<AppointmentResponseDTO> response = service.findByDateRange(start, end);
         return ResponseEntity.ok(response);
     }
