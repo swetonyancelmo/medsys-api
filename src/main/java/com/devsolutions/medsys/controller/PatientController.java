@@ -1,7 +1,12 @@
 package com.devsolutions.medsys.controller;
 
-import com.devsolutions.medsys.model.Patient;
+import com.devsolutions.medsys.dto.patient.PatientRequestDTO;
+import com.devsolutions.medsys.dto.patient.PatientResponseDTO;
 import com.devsolutions.medsys.service.PatientService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,39 +14,29 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/patients")
+@RequiredArgsConstructor
 public class PatientController {
 
     private final PatientService patientService;
 
-    public PatientController(PatientService patientService) {
-        this.patientService = patientService;
-    }
-
-    // Criar paciente
     @PostMapping
-    public Patient create(@RequestBody Patient patient) {
-
-        return patientService.create(patient);
+    public ResponseEntity<PatientResponseDTO> create(@RequestBody @Valid PatientRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(patientService.create(dto));
     }
 
-    // Listar pacientes
     @GetMapping
-    public List<Patient> findAll() {
-
-        return patientService.findAll();
+    public ResponseEntity<List<PatientResponseDTO>> findAll() {
+        return ResponseEntity.ok(patientService.findAll());
     }
 
-    // Buscar paciente por ID
     @GetMapping("/{id}")
-    public Patient findById(@PathVariable UUID id) {
-
-        return patientService.findById(id);
+    public ResponseEntity<PatientResponseDTO> findById(@PathVariable UUID id) {
+        return ResponseEntity.ok(patientService.findById(id));
     }
 
-    // Deletar paciente
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
-
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         patientService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
