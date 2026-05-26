@@ -3,7 +3,6 @@ package com.devsolutions.medsys.service;
 import com.devsolutions.medsys.model.Role;
 import com.devsolutions.medsys.model.User;
 import com.devsolutions.medsys.model.UserRole;
-import com.devsolutions.medsys.model.UserRoleId;
 import com.devsolutions.medsys.repository.RoleRepository;
 import com.devsolutions.medsys.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +61,6 @@ public class UserService implements UserDetailsService {
                 .build();
 
         UserRole userRole = new UserRole();
-        userRole.setId(new UserRoleId());
         userRole.setUser(user);
         userRole.setRole(role);
         user.getRoles().add(userRole);
