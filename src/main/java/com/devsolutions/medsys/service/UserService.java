@@ -3,8 +3,10 @@ package com.devsolutions.medsys.service;
 import com.devsolutions.medsys.model.Role;
 import com.devsolutions.medsys.model.User;
 import com.devsolutions.medsys.model.UserRole;
+import com.devsolutions.medsys.model.UserRoleId;
 import com.devsolutions.medsys.repository.RoleRepository;
 import com.devsolutions.medsys.repository.UserRepository;
+import com.devsolutions.medsys.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +24,7 @@ import java.util.UUID;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -60,12 +63,13 @@ public class UserService implements UserDetailsService {
                 .password(passwordEncoder.encode(password))
                 .build();
 
-        UserRole userRole = new UserRole();
-        userRole.setUser(user);
-        userRole.setRole(role);
-        user.getRoles().add(userRole);
+        User savedUser = userRepository.save(user);
 
-        return userRepository.save(user);
+        UserRoleId userRoleId = new UserRoleId(savedUser.getId(), role.getId());
+        UserRole userRole = new UserRole(userRoleId, savedUser, role);
+        userRoleRepository.save(userRole);
+
+        return savedUser;
     }
 
     @Transactional
