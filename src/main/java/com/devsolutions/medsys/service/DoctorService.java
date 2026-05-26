@@ -1,5 +1,6 @@
 package com.devsolutions.medsys.service;
 
+import com.devsolutions.medsys.exception.ResourceNotFoundException;
 import com.devsolutions.medsys.model.Doctor;
 import com.devsolutions.medsys.repository.DoctorRepository;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class DoctorService {
     public Doctor findById(UUID id) {
 
         return doctorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Doutor não encontrado"));
     }
     public void delete(UUID id) {
 

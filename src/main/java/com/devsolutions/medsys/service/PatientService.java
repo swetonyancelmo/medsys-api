@@ -1,6 +1,8 @@
 package com.devsolutions.medsys.service;
 import java.util.List;
 import java.util.UUID;
+
+import com.devsolutions.medsys.exception.ResourceNotFoundException;
 import com.devsolutions.medsys.model.Patient;
 import com.devsolutions.medsys.repository.PatientRepository;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ public class PatientService {
     public Patient findById(UUID id) {
 
         return patientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Patient not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente não encontrado"));
     }
     public void delete(UUID id) {
 
