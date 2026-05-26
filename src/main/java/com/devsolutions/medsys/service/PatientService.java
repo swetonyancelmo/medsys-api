@@ -1,5 +1,6 @@
 package com.devsolutions.medsys.service;
 
+import com.devsolutions.medsys.dto.auth.PatientRegisterRequestDTO;
 import com.devsolutions.medsys.dto.patient.PatientRequestDTO;
 import com.devsolutions.medsys.dto.patient.PatientResponseDTO;
 import com.devsolutions.medsys.exception.ResourceNotFoundException;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,6 +37,21 @@ public class PatientService {
                 .phone(dto.phone())
                 .birthDate(dto.birthDate())
                 .address(dto.address())
+                .build();
+
+        return patientMapper.toDTO(patientRepository.save(patient));
+    }
+
+    @Transactional
+    public PatientResponseDTO createFromUser(User user, PatientRegisterRequestDTO dto) {
+        Patient patient = Patient.builder()
+                .user(user)
+                .name(dto.name())
+                .cpf(dto.cpf())
+                .phone(dto.phone())
+                .birthDate(dto.birthDate())
+                .address(dto.address())
+                .createdAt(LocalDateTime.now())
                 .build();
 
         return patientMapper.toDTO(patientRepository.save(patient));

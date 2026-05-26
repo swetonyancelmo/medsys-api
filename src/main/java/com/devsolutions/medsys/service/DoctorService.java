@@ -1,5 +1,6 @@
 package com.devsolutions.medsys.service;
 
+import com.devsolutions.medsys.dto.auth.DoctorRegisterRequestDTO;
 import com.devsolutions.medsys.dto.doctor.DoctorRequestDTO;
 import com.devsolutions.medsys.dto.doctor.DoctorResponseDTO;
 import com.devsolutions.medsys.exception.ResourceNotFoundException;
@@ -31,6 +32,23 @@ public class DoctorService {
         User user = userRepository.findById(dto.userId())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
+        Specialty specialty = specialtyRepository.findById(dto.specialtyId())
+                .orElseThrow(() -> new ResourceNotFoundException("Especialidade não encontrada"));
+
+        Doctor doctor = Doctor.builder()
+                .user(user)
+                .specialty(specialty)
+                .name(dto.name())
+                .crm(dto.crm())
+                .phone(dto.phone())
+                .appointmentDurationMin(dto.appointmentDurationMin() != null ? dto.appointmentDurationMin() : 30)
+                .build();
+
+        return doctorMapper.toDTO(doctorRepository.save(doctor));
+    }
+
+    @Transactional
+    public DoctorResponseDTO createFromUser(User user, DoctorRegisterRequestDTO dto) {
         Specialty specialty = specialtyRepository.findById(dto.specialtyId())
                 .orElseThrow(() -> new ResourceNotFoundException("Especialidade não encontrada"));
 
