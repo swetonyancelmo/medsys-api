@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class DoctorAvailabilityController {
     private final DoctorAvailabilityService service;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     public ResponseEntity<DoctorAvailabilityResponseDTO> registerAvailability(
             @RequestBody @Valid DoctorAvailabilityRequestDTO dto) {
         DoctorAvailabilityResponseDTO response = service.registerAvailability(dto);
@@ -27,6 +29,7 @@ public class DoctorAvailabilityController {
     }
 
     @GetMapping("/doctor/{doctorId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ATENDENTE', 'DOCTOR')")
     public ResponseEntity<List<DoctorAvailabilityResponseDTO>> findActiveAvailabilitiesByDoctor(
             @PathVariable UUID doctorId) {
         List<DoctorAvailabilityResponseDTO> response = service.findActiveAvailabilitiesByDoctor(doctorId);
@@ -34,6 +37,7 @@ public class DoctorAvailabilityController {
     }
 
     @PatchMapping("/{id}/disable")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
     public ResponseEntity<Void> disableAvailability(@PathVariable UUID id) {
         service.disableAvailability(id);
         return ResponseEntity.noContent().build();
