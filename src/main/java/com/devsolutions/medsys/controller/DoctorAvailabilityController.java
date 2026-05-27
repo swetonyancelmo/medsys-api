@@ -1,5 +1,6 @@
 package com.devsolutions.medsys.controller;
 
+import com.devsolutions.medsys.controller.docs.DoctorAvailabilityControllerDocs;
 import com.devsolutions.medsys.dto.doctorAvailability.DoctorAvailabilityRequestDTO;
 import com.devsolutions.medsys.dto.doctorAvailability.DoctorAvailabilityResponseDTO;
 import com.devsolutions.medsys.service.DoctorAvailabilityService;
@@ -16,12 +17,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/doctor-availabilities")
 @RequiredArgsConstructor
-public class DoctorAvailabilityController {
+public class DoctorAvailabilityController implements DoctorAvailabilityControllerDocs {
 
     private final DoctorAvailabilityService service;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
+    @PreAuthorize("hasAnyRole('ATENDENTE', 'DOCTOR')")
     public ResponseEntity<DoctorAvailabilityResponseDTO> registerAvailability(
             @RequestBody @Valid DoctorAvailabilityRequestDTO dto) {
         DoctorAvailabilityResponseDTO response = service.registerAvailability(dto);
@@ -29,7 +30,7 @@ public class DoctorAvailabilityController {
     }
 
     @GetMapping("/doctor/{doctorId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ATENDENTE', 'DOCTOR')")
+    @PreAuthorize("hasAnyRole('ATENDENTE', 'DOCTOR')")
     public ResponseEntity<List<DoctorAvailabilityResponseDTO>> findActiveAvailabilitiesByDoctor(
             @PathVariable UUID doctorId) {
         List<DoctorAvailabilityResponseDTO> response = service.findActiveAvailabilitiesByDoctor(doctorId);
@@ -37,7 +38,7 @@ public class DoctorAvailabilityController {
     }
 
     @PatchMapping("/{id}/disable")
-    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
+    @PreAuthorize("hasAnyRole('ATENDENTE', 'DOCTOR')")
     public ResponseEntity<Void> disableAvailability(@PathVariable UUID id) {
         service.disableAvailability(id);
         return ResponseEntity.noContent().build();

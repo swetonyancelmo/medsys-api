@@ -1,5 +1,6 @@
 package com.devsolutions.medsys.controller;
 
+import com.devsolutions.medsys.controller.docs.PrescriptionControllerDocs;
 import com.devsolutions.medsys.dto.prescription.PrescriptionRequestDTO;
 import com.devsolutions.medsys.dto.prescription.PrescriptionResponseDTO;
 import com.devsolutions.medsys.service.PrescriptionService;
@@ -15,26 +16,26 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/prescriptions")
 @RequiredArgsConstructor
-public class PrescriptionController {
+public class PrescriptionController implements PrescriptionControllerDocs {
 
     private final PrescriptionService service;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR')")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<PrescriptionResponseDTO> create(@RequestBody @Valid PrescriptionRequestDTO dto) {
         PrescriptionResponseDTO response = service.createPrescription(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ATENDENTE', 'DOCTOR')")
+    @PreAuthorize("hasAnyRole('ATENDENTE', 'DOCTOR', 'PATIENT')")
     public ResponseEntity<PrescriptionResponseDTO> findById(@PathVariable UUID id) {
         PrescriptionResponseDTO response = service.findById(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/appointment/{appointmentId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'ATENDENTE', 'DOCTOR')")
+    @PreAuthorize("hasAnyRole('ATENDENTE', 'DOCTOR', 'PATIENT')")
     public ResponseEntity<PrescriptionResponseDTO> findByAppointmentId(@PathVariable UUID appointmentId) {
         PrescriptionResponseDTO response = service.findByAppointmentId(appointmentId);
         return ResponseEntity.ok(response);
