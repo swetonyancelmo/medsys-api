@@ -36,7 +36,7 @@ public class Appointment {
     private LocalDateTime scheduledAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "appointment_status")
+    @Column(nullable = false, length = 255)
     @Builder.Default
     private AppointmentStatus status = AppointmentStatus.SCHEDULED;
 
