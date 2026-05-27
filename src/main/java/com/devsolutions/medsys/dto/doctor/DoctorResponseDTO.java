@@ -14,6 +14,7 @@ public record DoctorResponseDTO(
         String phone,
         Integer appointmentDurationMin,
         Boolean active,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
 ) {
 }

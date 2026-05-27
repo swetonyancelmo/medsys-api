@@ -14,6 +14,7 @@ public record PatientResponseDTO(
         LocalDate birthDate,
         String address,
         Boolean active,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
 ) {
 }
