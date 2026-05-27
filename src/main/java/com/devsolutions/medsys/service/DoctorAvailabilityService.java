@@ -9,13 +9,12 @@ import com.devsolutions.medsys.model.Doctor;
 import com.devsolutions.medsys.model.DoctorAvailability;
 import com.devsolutions.medsys.repository.DoctorAvailabilityRepository;
 import com.devsolutions.medsys.repository.DoctorRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,12 +48,12 @@ public class DoctorAvailabilityService {
         return mapper.toDTO(saved);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<DoctorAvailabilityResponseDTO> findActiveAvailabilitiesByDoctor(UUID doctorId) {
         return repository.findByDoctorIdAndActiveTrue(doctorId)
                 .stream()
                 .map(mapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
