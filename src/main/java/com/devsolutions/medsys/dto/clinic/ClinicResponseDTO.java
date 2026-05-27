@@ -1,18 +1,15 @@
-package com.devsolutions.medsys.dto.patient;
+package com.devsolutions.medsys.dto.clinic;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record PatientResponseDTO(
+public record ClinicResponseDTO(
         UUID id,
-        UUID userId,
-        String email,
         String name,
-        String cpf,
+        String cnpj,
         String phone,
-        LocalDate birthDate,
         String address,
+        String email,
         Boolean active,
         LocalDateTime createdAt,
         LocalDateTime updatedAt

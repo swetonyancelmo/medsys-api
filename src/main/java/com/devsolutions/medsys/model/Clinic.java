@@ -5,21 +5,18 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "patient")
+@Table(name = "clinic")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Patient {
+public class Clinic {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,33 +24,24 @@ public class Patient {
     @EqualsAndHashCode.Include
     private UUID id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false, unique = true,
-            foreignKey = @ForeignKey(name = "fk_patient_user"))
-    private User user;
-
     @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(nullable = false, unique = true, length = 14)
-    private String cpf;
+    @Column(nullable = false, unique = true, length = 18)
+    private String cnpj;
 
     @Column(length = 20)
     private String phone;
 
-    @Column(name = "birth_date")
-    private LocalDate birthDate;
-
     @Column(length = 255)
     private String address;
+
+    @Column(length = 255)
+    private String email;
 
     @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;
-
-    @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<Appointment> appointments = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp

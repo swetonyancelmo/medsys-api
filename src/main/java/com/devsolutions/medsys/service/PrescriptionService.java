@@ -9,7 +9,7 @@ import com.devsolutions.medsys.model.Appointment;
 import com.devsolutions.medsys.model.Prescription;
 import com.devsolutions.medsys.repository.AppointmentRepository;
 import com.devsolutions.medsys.repository.PrescriptionRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,14 +43,14 @@ public class PrescriptionService {
         return mapper.toDTO(saved);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PrescriptionResponseDTO findById(UUID id){
         return repository.findById(id)
                 .map(mapper::toDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("Receita não encontrada."));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PrescriptionResponseDTO findByAppointmentId (UUID id){
         return repository.findByAppointmentId(id)
                 .map(mapper::toDTO)

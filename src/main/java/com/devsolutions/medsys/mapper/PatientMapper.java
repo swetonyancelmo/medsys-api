@@ -22,7 +22,8 @@ public class PatientMapper {
                 patient.getBirthDate(),
                 patient.getAddress(),
                 patient.getActive(),
-                patient.getCreatedAt()
+                patient.getCreatedAt(),
+                patient.getUpdatedAt()
         );
     }
 }

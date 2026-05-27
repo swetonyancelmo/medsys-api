@@ -40,9 +40,18 @@ public class JwtUtil {
         return extractClaim(token, Claims::getSubject);
     }
 
+    @SuppressWarnings("unchecked")
+    public List<String> extractRoles(String token) {
+        return extractClaim(token, claims -> claims.get("roles", List.class));
+    }
+
+    public boolean isTokenValid(String token, String email) {
+        final String tokenEmail = extractEmail(token);
+        return tokenEmail.equals(email) && !isTokenExpired(token);
+    }
+
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String email = extractEmail(token);
-        return email.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        return isTokenValid(token, userDetails.getUsername());
     }
 
     private boolean isTokenExpired(String token) {

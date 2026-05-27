@@ -1,10 +1,10 @@
 package com.devsolutions.medsys.controller;
 
-import com.devsolutions.medsys.controller.docs.DoctorControllerDocs;
-import com.devsolutions.medsys.dto.doctor.DoctorRequestDTO;
-import com.devsolutions.medsys.dto.doctor.DoctorResponseDTO;
-import com.devsolutions.medsys.dto.doctor.DoctorUpdateDTO;
-import com.devsolutions.medsys.service.DoctorService;
+import com.devsolutions.medsys.controller.docs.ClinicControllerDocs;
+import com.devsolutions.medsys.dto.clinic.ClinicRequestDTO;
+import com.devsolutions.medsys.dto.clinic.ClinicResponseDTO;
+import com.devsolutions.medsys.dto.clinic.ClinicUpdateDTO;
+import com.devsolutions.medsys.service.ClinicService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
@@ -22,47 +22,48 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/doctors")
+@RequestMapping("/clinics")
 @RequiredArgsConstructor
 @Validated
-public class DoctorController implements DoctorControllerDocs {
+public class ClinicController implements ClinicControllerDocs {
 
-    private final DoctorService doctorService;
+    private final ClinicService service;
 
     @PostMapping
     @PreAuthorize("hasRole('ATENDENTE')")
-    public ResponseEntity<DoctorResponseDTO> create(@RequestBody @Valid DoctorRequestDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(doctorService.create(dto));
+    public ResponseEntity<ClinicResponseDTO> create(@RequestBody @Valid ClinicRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ATENDENTE', 'DOCTOR')")
-    public ResponseEntity<Page<DoctorResponseDTO>> findAll(
+    @PreAuthorize("hasAnyRole('ATENDENTE', 'DOCTOR', 'PATIENT')")
+    public ResponseEntity<Page<ClinicResponseDTO>> findAll(
+            @RequestParam(required = false) String name,
             @RequestParam(value = "page", defaultValue = "0") @Min(0) Integer page,
             @RequestParam(value = "size", defaultValue = "12") @Positive Integer size,
             @RequestParam(value = "direction", defaultValue = "asc") String direction) {
         var sortDirection = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "name"));
-        return ResponseEntity.ok(doctorService.findAll(pageable));
+        return ResponseEntity.ok(service.findAll(name, pageable));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ATENDENTE', 'DOCTOR')")
-    public ResponseEntity<DoctorResponseDTO> findById(@PathVariable UUID id) {
-        return ResponseEntity.ok(doctorService.findById(id));
+    @PreAuthorize("hasAnyRole('ATENDENTE', 'DOCTOR', 'PATIENT')")
+    public ResponseEntity<ClinicResponseDTO> findById(@PathVariable UUID id) {
+        return ResponseEntity.ok(service.findById(id));
     }
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ATENDENTE')")
-    public ResponseEntity<DoctorResponseDTO> update(@PathVariable UUID id,
-                                                    @RequestBody DoctorUpdateDTO dto) {
-        return ResponseEntity.ok(doctorService.update(id, dto));
+    public ResponseEntity<ClinicResponseDTO> update(@PathVariable UUID id,
+                                                    @RequestBody ClinicUpdateDTO dto) {
+        return ResponseEntity.ok(service.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ATENDENTE')")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        doctorService.delete(id);
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

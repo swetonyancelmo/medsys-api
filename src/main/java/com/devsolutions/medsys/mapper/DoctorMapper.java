@@ -23,7 +23,8 @@ public class DoctorMapper {
                 doctor.getPhone(),
                 doctor.getAppointmentDurationMin(),
                 doctor.getActive(),
-                doctor.getCreatedAt()
+                doctor.getCreatedAt(),
+                doctor.getUpdatedAt()
         );
     }
 }

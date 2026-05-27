@@ -14,13 +14,16 @@ import com.devsolutions.medsys.repository.AppointmentRepository;
 import com.devsolutions.medsys.repository.DoctorAvailabilityRepository;
 import com.devsolutions.medsys.repository.DoctorRepository;
 import com.devsolutions.medsys.repository.PatientRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 
@@ -56,18 +59,18 @@ public class AppointmentService {
                 .status(AppointmentStatus.SCHEDULED)
                 .build();
 
-        Appointment saved = repository.save(appointment);
+        Appointment saved = repository.saveAndFlush(appointment);
         return mapper.toDTO(saved);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public AppointmentResponseDTO findById(UUID id){
         return repository.findById(id)
                 .map(mapper::toDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado."));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<AppointmentResponseDTO> findByDoctorAndDateRange(UUID id, LocalDateTime start, LocalDateTime end){
         validateDateRange(start, end);
         return repository.findByDoctorIdAndScheduledAtBetween(id,start,end)
@@ -76,7 +79,7 @@ public class AppointmentService {
                 .toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<AppointmentResponseDTO> findByPatient(UUID id){
         return repository.findByPatientIdOrderByScheduledAtDesc(id)
                 .stream()
@@ -84,7 +87,7 @@ public class AppointmentService {
                 .toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<AppointmentResponseDTO> findByDateRange(LocalDateTime start, LocalDateTime end){
         validateDateRange(start, end);
         return repository.findByScheduledAtBetweenOrderByScheduledAtAsc(start,end)
@@ -127,10 +130,14 @@ public class AppointmentService {
     }
 
     private void validateDoctorAvailability(AppointmentRequestDTO dto) {
-        int dayOfWeek = dto.scheduledAt().getDayOfWeek().getValue();
+        DayOfWeek dayOfWeek = dto.scheduledAt().getDayOfWeek();
+        String dayName = dayOfWeek.getDisplayName(TextStyle.FULL, new Locale("pt", "BR"));
+
         DoctorAvailability availability = doctorAvailabilityRepository
-                .findByDoctorIdAndDayOfWeekAndActiveTrue(dto.doctorId(), dayOfWeek)
-                .orElseThrow(() -> new BusinessException("O médico não possui disponibilidade ativa para esse dia da semana."));
+                .findByDoctorIdAndDayOfWeekAndActiveTrue(dto.doctorId(), dayOfWeek.getValue())
+                .orElseThrow(() -> new BusinessException(
+                        "O médico não possui disponibilidade ativa para " + dayName +
+                        ". Lembrete: a API usa convenção ISO-8601 (1=Segunda, 2=Terça, ..., 7=Domingo)."));
 
         LocalTime appointmentTime = dto.scheduledAt().toLocalTime();
         if (appointmentTime.isBefore(availability.getStartTime()) || !appointmentTime.isBefore(availability.getEndTime())) {

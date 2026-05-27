@@ -3,6 +3,7 @@ package com.devsolutions.medsys.service;
 import com.devsolutions.medsys.dto.auth.DoctorRegisterRequestDTO;
 import com.devsolutions.medsys.dto.doctor.DoctorRequestDTO;
 import com.devsolutions.medsys.dto.doctor.DoctorResponseDTO;
+import com.devsolutions.medsys.dto.doctor.DoctorUpdateDTO;
 import com.devsolutions.medsys.exception.ResourceNotFoundException;
 import com.devsolutions.medsys.mapper.DoctorMapper;
 import com.devsolutions.medsys.model.Doctor;
@@ -14,6 +15,9 @@ import com.devsolutions.medsys.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -44,7 +48,7 @@ public class DoctorService {
                 .appointmentDurationMin(dto.appointmentDurationMin() != null ? dto.appointmentDurationMin() : 30)
                 .build();
 
-        return doctorMapper.toDTO(doctorRepository.save(doctor));
+        return doctorMapper.toDTO(doctorRepository.saveAndFlush(doctor));
     }
 
     @Transactional
@@ -61,14 +65,12 @@ public class DoctorService {
                 .appointmentDurationMin(dto.appointmentDurationMin() != null ? dto.appointmentDurationMin() : 30)
                 .build();
 
-        return doctorMapper.toDTO(doctorRepository.save(doctor));
+        return doctorMapper.toDTO(doctorRepository.saveAndFlush(doctor));
     }
 
     @Transactional(readOnly = true)
-    public List<DoctorResponseDTO> findAll() {
-        return doctorRepository.findAll().stream()
-                .map(doctorMapper::toDTO)
-                .toList();
+    public Page<DoctorResponseDTO> findAll(Pageable pageable) {
+        return doctorRepository.findAll(pageable).map(doctorMapper::toDTO);
     }
 
     @Transactional(readOnly = true)
@@ -76,6 +78,30 @@ public class DoctorService {
         Doctor doctor = doctorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Médico não encontrado"));
         return doctorMapper.toDTO(doctor);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DoctorResponseDTO> findBySpecialty(UUID specialtyId) {
+        return doctorRepository.findBySpecialtyIdAndActiveTrue(specialtyId).stream()
+                .map(doctorMapper::toDTO)
+                .toList();
+    }
+
+    @Transactional
+    public DoctorResponseDTO update(UUID id, DoctorUpdateDTO dto) {
+        Doctor doctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Médico não encontrado"));
+
+        if (dto.name() != null && !dto.name().isBlank()) doctor.setName(dto.name());
+        if (dto.phone() != null) doctor.setPhone(dto.phone());
+        if (dto.appointmentDurationMin() != null) doctor.setAppointmentDurationMin(dto.appointmentDurationMin());
+        if (dto.specialtyId() != null) {
+            Specialty specialty = specialtyRepository.findById(dto.specialtyId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Especialidade não encontrada"));
+            doctor.setSpecialty(specialty);
+        }
+
+        return doctorMapper.toDTO(doctorRepository.save(doctor));
     }
 
     @Transactional
