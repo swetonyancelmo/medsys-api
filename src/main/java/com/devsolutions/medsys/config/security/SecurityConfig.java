@@ -28,6 +28,11 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
 
     @Bean
+    public LoginRateLimitFilter loginRateLimitFilter() {
+        return new LoginRateLimitFilter();
+    }
+
+    @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
@@ -62,6 +67,7 @@ public class SecurityConfig {
                         })
                 )
                 .authenticationProvider(authenticationProvider())
+                .addFilterBefore(loginRateLimitFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
