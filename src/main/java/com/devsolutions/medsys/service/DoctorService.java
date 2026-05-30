@@ -13,6 +13,10 @@ import com.devsolutions.medsys.repository.DoctorRepository;
 import com.devsolutions.medsys.repository.SpecialtyRepository;
 import com.devsolutions.medsys.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +36,7 @@ public class DoctorService {
     private final DoctorMapper doctorMapper;
 
     @Transactional
+    @CacheEvict(value = "doctors-by-specialty", key = "#dto.specialtyId")
     public DoctorResponseDTO create(DoctorRequestDTO dto) {
         User user = userRepository.findById(dto.userId())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
@@ -52,6 +57,7 @@ public class DoctorService {
     }
 
     @Transactional
+    @CacheEvict(value = "doctors-by-specialty", key = "#dto.specialtyId")
     public DoctorResponseDTO createFromUser(User user, DoctorRegisterRequestDTO dto) {
         Specialty specialty = specialtyRepository.findById(dto.specialtyId())
                 .orElseThrow(() -> new ResourceNotFoundException("Especialidade não encontrada"));
@@ -74,6 +80,7 @@ public class DoctorService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "doctors", key = "#id")
     public DoctorResponseDTO findById(UUID id) {
         Doctor doctor = doctorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Médico não encontrado"));
@@ -81,6 +88,7 @@ public class DoctorService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "doctors-by-specialty", key = "#specialtyId")
     public List<DoctorResponseDTO> findBySpecialty(UUID specialtyId) {
         return doctorRepository.findBySpecialtyIdAndActiveTrue(specialtyId).stream()
                 .map(doctorMapper::toDTO)
@@ -88,6 +96,10 @@ public class DoctorService {
     }
 
     @Transactional
+    @Caching(
+            put = @CachePut(value = "doctors", key = "#id"),
+            evict = @CacheEvict(value = "doctors-by-specialty", allEntries = true)
+    )
     public DoctorResponseDTO update(UUID id, DoctorUpdateDTO dto) {
         Doctor doctor = doctorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Médico não encontrado"));
@@ -105,6 +117,10 @@ public class DoctorService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "doctors", key = "#id"),
+            @CacheEvict(value = "doctors-by-specialty", allEntries = true)
+    })
     public void delete(UUID id) {
         Doctor doctor = doctorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Médico não encontrado"));

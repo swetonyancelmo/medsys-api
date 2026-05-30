@@ -14,6 +14,8 @@ import com.devsolutions.medsys.repository.AppointmentRepository;
 import com.devsolutions.medsys.repository.DoctorAvailabilityRepository;
 import com.devsolutions.medsys.repository.DoctorRepository;
 import com.devsolutions.medsys.repository.PatientRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -64,6 +66,7 @@ public class AppointmentService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "appointments", key = "#id")
     public AppointmentResponseDTO findById(UUID id){
         return repository.findById(id)
                 .map(mapper::toDTO)
@@ -97,6 +100,7 @@ public class AppointmentService {
     }
 
     @Transactional
+    @CacheEvict(value = "appointments", key = "#id")
     public AppointmentResponseDTO cancel(UUID id){
         Appointment appointment = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado."));
