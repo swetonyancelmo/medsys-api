@@ -8,6 +8,9 @@ import com.devsolutions.medsys.exception.ResourceNotFoundException;
 import com.devsolutions.medsys.model.Clinic;
 import com.devsolutions.medsys.repository.ClinicRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -47,6 +50,7 @@ public class ClinicService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "clinics", key = "#id")
     public ClinicResponseDTO findById(UUID id) {
         return repository.findById(id)
                 .map(this::toDTO)
@@ -54,6 +58,7 @@ public class ClinicService {
     }
 
     @Transactional
+    @CachePut(value = "clinics", key = "#id")
     public ClinicResponseDTO update(UUID id, ClinicUpdateDTO dto) {
         Clinic clinic = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Clínica não encontrada."));
@@ -67,6 +72,7 @@ public class ClinicService {
     }
 
     @Transactional
+    @CacheEvict(value = "clinics", key = "#id")
     public void delete(UUID id) {
         Clinic clinic = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Clínica não encontrada."));

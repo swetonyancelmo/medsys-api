@@ -9,6 +9,8 @@ import com.devsolutions.medsys.model.Doctor;
 import com.devsolutions.medsys.model.DoctorAvailability;
 import com.devsolutions.medsys.repository.DoctorAvailabilityRepository;
 import com.devsolutions.medsys.repository.DoctorRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class DoctorAvailabilityService {
     private final DoctorAvailabilityMapper mapper;
 
     @Transactional
+    @CacheEvict(value = "doctor-availabilities", key = "#dto.doctorId")
     public DoctorAvailabilityResponseDTO registerAvailability(DoctorAvailabilityRequestDTO dto) {
         // 1. Valida se o médico existe
         Doctor doctor = doctorRepository.findById(dto.doctorId())
@@ -49,6 +52,7 @@ public class DoctorAvailabilityService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "doctor-availabilities", key = "#doctorId")
     public List<DoctorAvailabilityResponseDTO> findActiveAvailabilitiesByDoctor(UUID doctorId) {
         return repository.findByDoctorIdAndActiveTrue(doctorId)
                 .stream()
@@ -57,6 +61,7 @@ public class DoctorAvailabilityService {
     }
 
     @Transactional
+    @CacheEvict(value = "doctor-availabilities", allEntries = true)
     public void disableAvailability(UUID id) {
         DoctorAvailability availability = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Disponibilidade não encontrada."));
