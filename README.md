@@ -13,6 +13,7 @@ O domínio da API é em português, voltado para clínicas que precisam de um ba
 - [Arquitetura e Entidades](#-arquitetura-e-entidades)
 - [Pré-requisitos](#-pré-requisitos)
 - [Como Executar](#-como-executar)
+- [Docker Hub](#-docker-hub)
 - [Variáveis de Ambiente](#-variáveis-de-ambiente)
 - [Endpoints](#-endpoints)
 - [Segurança](#-segurança)
@@ -222,6 +223,51 @@ http://localhost:8080/swagger-ui.html
 ```
 
 OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+
+---
+
+## 🐳 Docker Hub
+
+A imagem da aplicação está publicada no Docker Hub e pode ser usada diretamente, sem necessidade de clonar o repositório ou fazer build local.
+
+**Imagem:** [`swetony/medsys:latest`](https://hub.docker.com/r/swetony/medsys)
+
+### Puxar a imagem
+
+```bash
+docker pull swetony/medsys:latest
+```
+
+### Executar com Docker Compose (recomendado)
+
+A forma mais simples é usar o `docker-compose.yml` do repositório, que já sobe PostgreSQL, Redis e a aplicação juntos:
+
+```bash
+docker compose up -d
+```
+
+### Executar apenas o container da API
+
+Se preferir rodar somente a API (assumindo PostgreSQL e Redis já disponíveis):
+
+```bash
+docker run -d \
+  -p 8080:8080 \
+  -e DB_PASSWORD=sua_senha \
+  -e JWT_SECRET=seu_segredo_base64 \
+  -e JWT_EXPIRATION_MS=86400000 \
+  swetony/medsys:latest
+```
+
+### Detalhes da imagem
+
+| Característica | Detalhe |
+|---|---|
+| Build | Multi-stage (builder + runtime separados) |
+| Base (build) | `eclipse-temurin:21-jdk-alpine` |
+| Base (runtime) | `eclipse-temurin:21-jre-alpine` |
+| Porta exposta | `8080` |
+| Tamanho | Otimizado — apenas JRE na imagem final |
 
 ---
 
