@@ -55,6 +55,7 @@ public class PatientService {
                 .birthDate(dto.birthDate())
                 .address(dto.address())
                 .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
         return patientMapper.toDTO(patientRepository.save(patient));

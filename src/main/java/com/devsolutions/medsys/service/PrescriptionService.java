@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -38,6 +39,7 @@ public class PrescriptionService {
         prescription.setDescription(dto.description());
         prescription.setMedications(dto.medications());
         prescription.setExpiresAt(dto.expiresAt());
+        prescription.setCreatedAt(LocalDateTime.now());
 
         Prescription saved = repository.save(prescription);
 
