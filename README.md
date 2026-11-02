@@ -187,14 +187,14 @@ Isso inicializa:
 - **PostgreSQL 15** — porta `5433` (host) → `5432` (container), banco `medsys_db`
 - **Redis 7** — porta `6379`
 
-### 3. Configurar variáveis de ambiente (opcional)
+### 3. Configurar variáveis de ambiente
 
-As variáveis têm valores padrão de desenvolvimento. Para sobrescrever, exporte antes de rodar:
+O `JWT_SECRET` é **obrigatório**: sem ele a aplicação não sobe. Gere um segredo e exporte antes de rodar (há um modelo em `.env.example`):
 
 ```bash
-export DB_PASSWORD=sua_senha
-export JWT_SECRET=seu_segredo_base64_256bits
-export JWT_EXPIRATION_MS=86400000
+export JWT_SECRET=$(openssl rand -base64 32)
+export DB_PASSWORD=admin            # opcional, padrão de dev do docker-compose
+export JWT_EXPIRATION_MS=86400000   # opcional
 ```
 
 ### 4. Executar a aplicação
@@ -276,7 +276,7 @@ docker run -d \
 | Variável | Descrição | Valor padrão |
 |---|---|---|
 | `DB_PASSWORD` | Senha do PostgreSQL | `admin` |
-| `JWT_SECRET` | Segredo Base64 (mín. 256 bits) para assinatura JWT | valor de dev no `application.yml` |
+| `JWT_SECRET` | Segredo Base64 (mín. 256 bits) para assinatura JWT | **obrigatório**, sem padrão |
 | `JWT_EXPIRATION_MS` | Tempo de expiração do token em milissegundos | `86400000` (24 horas) |
 
 > ⚠️ **Nunca use os valores padrão em produção.** Sempre defina `JWT_SECRET` e `DB_PASSWORD` via variáveis de ambiente seguras.
