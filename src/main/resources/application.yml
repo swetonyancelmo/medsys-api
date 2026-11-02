@@ -25,5 +25,7 @@ spring:
       port: 6379
 
 jwt:
-  secret: ${JWT_SECRET:dGhpcy1pcy1hLXZlcnktc2VjcmV0LWtleS1mb3ItbWVkc3lzLWp3dC0yNTZiaXRz}
+  # Obrigatório: sem valor padrão de propósito. Se a variável faltar, a aplicação
+  # não sobe (melhor que assinar tokens com uma chave pública). Veja o .env.example.
+  secret: ${JWT_SECRET}
   expiration-ms: ${JWT_EXPIRATION_MS:86400000}
